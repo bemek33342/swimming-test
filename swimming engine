@@ -1,0 +1,179 @@
+/* eslint-disable require-yield, eqeqeq */
+
+import {
+  Sprite,
+  Trigger,
+  Watcher,
+  Costume,
+  Color,
+  Sound
+} from "https://unpkg.com/leopard@^1/dist/index.esm.js";
+
+export default class SwimmingEngine extends Sprite {
+  constructor(...args) {
+    super(...args);
+
+    this.costumes = [
+      new Costume("costume1", "./SwimmingEngine/costumes/costume1.svg", {
+        x: 14,
+        y: 14
+      })
+    ];
+
+    this.sounds = [new Sound("pop", "./SwimmingEngine/sounds/pop.wav")];
+
+    this.triggers = [
+      new Trigger(Trigger.GREEN_FLAG, this.whenGreenFlagClicked),
+      new Trigger(Trigger.GREEN_FLAG, this.whenGreenFlagClicked2),
+      new Trigger(Trigger.GREEN_FLAG, this.whenGreenFlagClicked3),
+      new Trigger(Trigger.GREEN_FLAG, this.whenGreenFlagClicked4),
+      new Trigger(Trigger.GREEN_FLAG, this.whenGreenFlagClicked5)
+    ];
+
+    this.vars.score = 0;
+    this.vars.yv = 0;
+    this.vars.xv = -5.8271929518681735e-21;
+    this.vars.level = 46;
+
+    this.watchers.score = new Watcher({
+      label: "SwimmingEngine: Score",
+      style: "large",
+      visible: true,
+      value: () => this.vars.score,
+      x: 246,
+      y: 172
+    });
+  }
+
+  *whenGreenFlagClicked() {}
+
+  *whenGreenFlagClicked2() {
+    while (true) {
+      if (
+        this.touching(this.sprites["Sprite4"].andClones()) &&
+        !this.touching(this.sprites["Sprite2"].andClones())
+      ) {
+        this.vars.score += 1;
+        yield* this.wait(1);
+      }
+      yield;
+    }
+  }
+
+  *whenGreenFlagClicked3() {
+    while (true) {
+      if (this.x > 239) {
+        this.goto(-239, this.y);
+        if (this.touching(this.sprites["Ground"].andClones())) {
+          this.goto(239, this.y);
+        }
+      }
+      yield;
+    }
+  }
+
+  *whenGreenFlagClicked4() {
+    this.vars.score = 0;
+    this.vars.yv = 0;
+    this.direction = 90;
+    this.rotationStyle = Sprite.RotationStyle.LEFT_RIGHT;
+    this.goto(0, 0);
+    this.stage.costume = "costume1";
+    this.costume = "costume1";
+    while (true) {
+      if (this.touching(this.sprites["Sprite3"].andClones())) {
+        if (this.vars.yv > -0.25) {
+          this.vars.yv += -0.1;
+        }
+        if (this.vars.yv < -0.25) {
+          this.vars.yv += 0.1;
+        }
+        if (this.keyPressed("up arrow")) {
+          if (this.vars.yv < -5) {
+            this.vars.yv += 2;
+          } else {
+            this.vars.yv += 0.25;
+          }
+        }
+        if (this.keyPressed("down arrow")) {
+          if (this.vars.yv > 5) {
+            this.vars.yv += -2;
+          } else {
+            this.vars.yv += -0.25;
+          }
+        }
+      } else {
+        this.vars.yv += -0.25;
+      }
+      if (this.keyPressed("right arrow")) {
+        this.direction = 90;
+        if (this.keyPressed("space")) {
+          this.vars.xv += 1;
+        } else {
+          this.vars.xv += 0.5;
+        }
+      }
+      if (this.keyPressed("left arrow")) {
+        this.direction = -90;
+        if (this.keyPressed("space")) {
+          this.vars.xv += -1;
+        } else {
+          this.vars.xv += -0.5;
+        }
+      }
+      this.vars.xv = this.vars.xv * 0.9;
+      this.x += this.vars.xv;
+      if (this.touching(this.sprites["Ground"].andClones())) {
+        this.y += 1;
+        if (this.touching(this.sprites["Ground"].andClones())) {
+          this.y += 1;
+          if (this.touching(this.sprites["Ground"].andClones())) {
+            this.y += 1;
+            if (this.touching(this.sprites["Ground"].andClones())) {
+              this.y += 1;
+              if (this.touching(this.sprites["Ground"].andClones())) {
+                this.y += 1;
+              }
+              if (this.touching(this.sprites["Ground"].andClones())) {
+                this.x += this.vars.xv * -1;
+                this.x += -1;
+                this.y += -5;
+                this.x += 1;
+              }
+            }
+          }
+        }
+      }
+      this.y += this.vars.yv;
+      if (this.touching(this.sprites["Ground"].andClones())) {
+        this.y += this.vars.yv * -1;
+        this.vars.yv = 0;
+      }
+      this.y += -1;
+      if (!this.touching(this.sprites["Sprite3"].andClones())) {
+        if (this.keyPressed("up arrow")) {
+          if (this.touching(this.sprites["Ground"].andClones())) {
+            this.vars.yv = -1;
+          }
+        }
+      }
+      this.y += 1;
+      if (this.touching(this.sprites["Ground"].andClones())) {
+        this.goto(-312, 150);
+      }
+      yield;
+    }
+  }
+
+  *whenGreenFlagClicked5() {
+    while (true) {
+      if (this.x < -239) {
+        this.goto(239, this.y);
+        if (this.touching(this.sprites["Ground"].andClones())) {
+          this.goto(-239, this.y);
+        }
+      }
+      yield;
+    }
+  }
+}
